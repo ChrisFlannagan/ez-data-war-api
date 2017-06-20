@@ -16,7 +16,7 @@ __Parameters:__
   
 ### Groups
 _Authorization Required to Read/Write/Delete_
-Groups are the container associate for items. The return value for any group `with sideLoad=true` will include all associated items
+Groups are the container associate for items. The return value for any group `with sideLoad=true` will include all associated items  
 __Parameters:__  
 * __name__ - `required` - `string` the name of the group
 * __description__ - `string` a description of that group
