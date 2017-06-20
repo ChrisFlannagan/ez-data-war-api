@@ -82,7 +82,10 @@ class ez_data_war{
 				'name' => 'groups',
 				'access' => true,
 				'params' => [
-					'name'        => 'string',
+					'name'        => [
+						'type' => 'string',
+						'required' => true
+					],
 					'description' => 'string',
 				],
 				'assoc' => [
