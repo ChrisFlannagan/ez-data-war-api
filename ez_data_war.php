@@ -8,14 +8,23 @@ License: GPL
 */
 
 
-class ez_data_war{
+
+add_filter( 'rest_pre_serve_request', function( $value ) {
+	header( 'Access-Control-Allow-Origin: *' );
+	header( 'Access-Control-Allow-Methods: POST, GET, OPTIONS, PUT, DELETE' );
+	header( 'Access-Control-Allow-Credentials: true' );
+	header( 'Access-Control-Allow-Headers: X-WP-Nonce, Content-Type, Authorization');
+
+	return $value;
+});
+
+class ez_data_war {
 
 	public function ez_data_config() {
 		return [
 			'api_name' => 'ez',
 			'version' => 1,
 			'limit' => 100,
-			'war_jwt_expire' => false,
 			'isolate_user_data' => true,
 		];
 	}
@@ -27,6 +36,11 @@ class ez_data_war{
 				'access' => true,
 				'callback' => [ $this, 'return_request' ]
 			],
+			'get_war_object' => [
+				'uri' => '/war-object',
+				'access' => null,
+				'callback' => [ $this, 'get_war_object']
+			],
 		];
 	}
 
@@ -34,6 +48,20 @@ class ez_data_war{
 		return $request;
 	}
 
+	public function get_war_object( $request ) {
+		$war_object = apply_filters( 'war_object', [] );
+		return $war_object;
+	}
+
+	/**
+	 * Data Models
+	 *
+	 * Items - Collection of data
+	 * Groups - Collection of items
+	 * Graph - Visual Representation of a group. x/y axis to be defined as item parameter
+	 *
+	 * @return array
+	 */
 	public function add_data_models() {
 		return [
 			[
@@ -74,7 +102,7 @@ class ez_data_war{
 				'assoc' => [
 					'groups' => [
 						'assoc' => 'one',
-						'bind'  => 'name'
+						'bind'  => 'id'
 					]
 				]
 			],
@@ -87,15 +115,65 @@ class ez_data_war{
 						'required' => true
 					],
 					'description' => 'string',
+					'misc_one_label' => 'string',
+					'misc_two_label' => 'string',
+					'misc_three_label' => 'string',
+					'misc_four_label' => 'string',
 				],
 				'assoc' => [
 					'items' => [
 						'assoc' => 'many',
-						'bind' => 'name'
+						'bind' => 'id'
 					]
 				]
+			],
+			[
+				'name' => 'graph',
+				'access' => true,
+				'params' => [
+					'group'  => [ 'type' => ['integer', 'string'], 'required' => true ],
+					'x_axis' => [ 'type' => 'string', 'required' => true ],
+					'y_axis' => [ 'type' => 'string', 'required' => true ],
+					'type'   => [ 'type' => 'string', 'required' => true ]
+				],
+				'assoc' => [
+					'groups' => [
+						'assoc' => 'one',
+						'bind'  => 'id'
+					]
+				],
+				'pre_return' => [ $this, 'get_graph' ]
 			]
 		];
+	}
+
+	public function get_graph( $request ) {
+		global $wpdb;
+		$table = $wpdb->prefix . 'ez_items';
+		$group = $request['group'];
+		$user = $request['user'];
+		$x_axis = $request['x_axis'];
+		$y_axis = $request['y_axis'];
+		if( 'created_on_month' === $y_axis ) {
+			$y_axis = 'created_on';
+			$request['results'] = $wpdb->get_results( "SELECT MONTH( $y_axis ) as 'label', YEAR( $y_axis ) as 'year', SUM($x_axis) as 'sum' FROM $table WHERE user = $user AND groups = $group GROUP BY MONTH( $y_axis ), YEAR( $y_axis )" );
+		} elseif ( 'created_on_day' === $y_axis ) {
+			$y_axis = 'created_on';
+			$request['results'] = $wpdb->get_results( "SELECT DAY( $y_axis ) as 'label', SUM($x_axis) as 'sum' FROM $table WHERE user = $user AND groups = $group GROUP BY DAY( $y_axis )" );
+		} else {
+			$request['results'] = $wpdb->get_results( "SELECT $y_axis as 'label', SUM($x_axis) as 'sum' FROM $table WHERE user = $user AND groups = $group GROUP BY $y_axis" );
+		}
+
+		if( $request['group'] ) {
+			$table = $wpdb->prefix . 'ez_groups';
+			$group_id = $request['group'];
+			$request['group_data'] = $wpdb->get_results( "SELECT * FROM $table WHERE `id` = $group_id" );
+			if( ! empty( $request['group_data'] ) ) {
+				$request['group_data'] = $request['group_data'][0];
+			}
+		}
+
+		return $request;
 	}
 
 }
@@ -116,3 +194,14 @@ function ez_data_war_init() {
 }
 
 add_action( 'plugins_loaded', 'ez_data_war_init' );
+
+
+add_filter( 'war_object', function( $object ) {
+	$object['user'] = false;
+	$object['user'] = wp_get_current_user();
+	if( isset( $object['user']->data->user_pass ) ) {
+		$object['user']->data->user_login = false;
+		$object['user']->data->user_pass = false;
+	}
+	return $object;
+}, 99, 1);
