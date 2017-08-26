@@ -203,5 +203,6 @@ add_filter( 'war_object', function( $object ) {
 		$object['user']->data->user_login = false;
 		$object['user']->data->user_pass = false;
 	}
+	$object['subscription'] = rcp_get_subscription( $object['user']->ID );
 	return $object;
 }, 99, 1);
