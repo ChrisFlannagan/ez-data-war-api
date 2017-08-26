@@ -16,7 +16,7 @@ add_filter( 'rest_pre_serve_request', function( $value ) {
 	header( 'Access-Control-Allow-Headers: X-WP-Nonce, Content-Type, Authorization');
 
 	return $value;
-});
+}, 15);
 
 class ez_data_war {
 
