@@ -197,6 +197,7 @@ add_action( 'plugins_loaded', 'ez_data_war_init' );
 
 
 add_filter( 'war_object', function( $object ) {
+    global $wpdb;
 	$object['user'] = false;
 	$object['user'] = wp_get_current_user();
 	if( isset( $object['user']->data->user_pass ) ) {
@@ -204,5 +205,11 @@ add_filter( 'war_object', function( $object ) {
 		$object['user']->data->user_pass = false;
 	}
 	$object['subscription'] = rcp_get_subscription_id( $object['user']->ID );
+
+	$table = $wpdb->prefix . 'ez_groups';
+    $user_id = $object['user']->ID;
+    $groups = $wpdb->get_results( "SELECT * FROM $table WHERE `user` = $user_id" );
+    $object['current_total_groups'] = count( $groups );
+
 	return $object;
 }, 99, 1);
