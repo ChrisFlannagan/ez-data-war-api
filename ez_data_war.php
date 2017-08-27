@@ -125,7 +125,10 @@ class ez_data_war {
 						'assoc' => 'many',
 						'bind' => 'id'
 					]
-				]
+				],
+                'callback' => [
+                    'delete_item' => [ $this, 'group_delete_callback' ],
+                ],
 			],
 			[
 				'name' => 'graph',
@@ -175,6 +178,17 @@ class ez_data_war {
 
 		return $request;
 	}
+
+	public function group_delete_callback( $request ) {
+	    global $wpdb;
+        $table = $wpdb->prefix . 'ez_items';
+        $group_id = $request['id'];
+
+        $deleted = $wpdb->delete( $table, [ 'groups' => absint( trim( $request->params->id ) ) ], array( '%s') );
+        $request['deleted'] = $deleted;
+
+        return $request;
+    }
 
 }
 
