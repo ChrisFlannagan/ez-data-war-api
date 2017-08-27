@@ -69,7 +69,7 @@ class ez_data_war {
 				'access' => true,
 				'params' => [
 					'groups' => [
-						'type' => 'string',
+						'type' => 'integer',
 						'required' => true,
 					],
 					'value' => [
@@ -102,8 +102,8 @@ class ez_data_war {
 				'assoc' => [
 					'groups' => [
 						'assoc' => 'one',
-						'bind'  => 'id',
-                        'match' => 'groups'
+						'bind'  => 'groups',
+                        'match' => 'id'
 					]
 				]
 			],
@@ -144,8 +144,8 @@ class ez_data_war {
 				'assoc' => [
 					'groups' => [
 						'assoc' => 'one',
-						'bind'  => 'id',
-                        'match' => 'group'
+						'bind'  => 'group',
+                        'match' => 'id'
 					]
 				],
 				'pre_return' => [ $this, 'get_graph' ]
