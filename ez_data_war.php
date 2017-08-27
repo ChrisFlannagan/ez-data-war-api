@@ -64,7 +64,7 @@ class ez_data_war {
 	 */
 	public function add_data_models() {
 		return [
-			[
+			'items' => [
 				'name' => 'items',
 				'access' => true,
 				'params' => [
@@ -107,7 +107,7 @@ class ez_data_war {
 					]
 				]
 			],
-			[
+			'groups' => [
 				'name' => 'groups',
 				'access' => true,
 				'params' => [
@@ -132,7 +132,7 @@ class ez_data_war {
                     'delete_item' => [ $this, 'group_delete_callback' ],
                 ],
 			],
-			[
+			'graph' => [
 				'name' => 'graph',
 				'access' => true,
 				'params' => [
