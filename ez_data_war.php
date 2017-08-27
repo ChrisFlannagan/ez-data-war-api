@@ -102,7 +102,8 @@ class ez_data_war {
 				'assoc' => [
 					'groups' => [
 						'assoc' => 'one',
-						'bind'  => 'id'
+						'bind'  => 'id',
+                        'match' => 'groups'
 					]
 				]
 			],
@@ -123,7 +124,8 @@ class ez_data_war {
 				'assoc' => [
 					'items' => [
 						'assoc' => 'many',
-						'bind' => 'id'
+						'bind' => 'id',
+                        'match' => 'groups',
 					]
 				],
                 'callback' => [
@@ -142,7 +144,8 @@ class ez_data_war {
 				'assoc' => [
 					'groups' => [
 						'assoc' => 'one',
-						'bind'  => 'id'
+						'bind'  => 'id',
+                        'match' => 'group'
 					]
 				],
 				'pre_return' => [ $this, 'get_graph' ]
@@ -180,6 +183,8 @@ class ez_data_war {
 	}
 
 	public function group_delete_callback( $request ) {
+	    var_dump( $request );
+	    wp_die();
 	    global $wpdb;
         $table = $wpdb->prefix . 'ez_items';
         $group_id = $request['id'];
