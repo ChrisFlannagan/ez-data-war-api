@@ -157,9 +157,11 @@ class ez_data_war {
 		global $wpdb;
 		$table = $wpdb->prefix . 'ez_items';
 		$group = $request['group'];
+		$group = $group['id'];
 		$user = $request['user'];
 		$x_axis = $request['x_axis'];
 		$y_axis = $request['y_axis'];
+
 		if( 'created_on_month' === $y_axis ) {
 			$y_axis = 'created_on';
 			$request['results'] = $wpdb->get_results( "SELECT MONTH( $y_axis ) as 'label', YEAR( $y_axis ) as 'year', SUM($x_axis) as 'sum' FROM $table WHERE user = $user AND groups = $group GROUP BY MONTH( $y_axis ), YEAR( $y_axis )" );
@@ -173,6 +175,7 @@ class ez_data_war {
 		if( $request['group'] ) {
 			$table = $wpdb->prefix . 'ez_groups';
 			$group_id = $request['group'];
+			$group_id = $request['group']['id'];
 			$request['group_data'] = $wpdb->get_results( "SELECT * FROM $table WHERE `id` = $group_id" );
 			if( ! empty( $request['group_data'] ) ) {
 				$request['group_data'] = $request['group_data'][0];
