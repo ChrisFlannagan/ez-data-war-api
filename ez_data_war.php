@@ -186,14 +186,19 @@ class ez_data_war {
 	}
 
 	public function group_delete_callback( $request ) {
-	    var_dump( $request );
-	    wp_die();
 	    global $wpdb;
-        $table = $wpdb->prefix . 'ez_items';
-        $group_id = $request['id'];
 
-        $deleted = $wpdb->delete( $table, [ 'groups' => absint( trim( $request->params->id ) ) ], array( '%s') );
-        $request['deleted'] = $deleted;
+        $table = $wpdb->prefix . 'ez_items';
+        $deleted_items = $wpdb->delete( $table, [ 'groups' => absint( trim( $request->params->id ) ) ], array( '%s') );
+        $request->deleted_items = $deleted_items;
+
+        $table = $wpdb->prefix . 'ez_graph';
+        $deleted_graphs = $wpdb->delete( $table, [ 'group' => absint( trim( $request->params->id ) ) ], array( '%s') );
+        $request->deleted_graphs = $deleted_graphs;
+
+        $table = $wpdb->prefix . 'ez_groups';
+        $deleted_group = $wpdb->delete( $table, [ 'id' => absint( trim( $request->params->id ) ) ], array( '%s') );
+        $request->deleted_group = $deleted_group;
 
         return $request;
     }
