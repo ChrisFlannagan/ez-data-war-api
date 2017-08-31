@@ -149,7 +149,26 @@ class ez_data_war {
 					]
 				],
 				'pre_return' => [ $this, 'get_graph' ]
-			]
+			],
+            'table' => [
+                'name' => 'table',
+                'access' => true,
+                'params' => [
+                    'group'  => [ 'type' => ['integer', 'string'], 'required' => true ],
+                    'x_axis' => [ 'type' => 'string', 'required' => true ],
+                    'y_axis' => [ 'type' => 'string', 'required' => true ],
+                    'columns_one_label' => [ 'type' => 'string' ],
+                    'columns_two_label' => [ 'type' => 'string' ],
+                ],
+                'assoc' => [
+                    'groups' => [
+                        'assoc' => 'one',
+                        'bind'  => 'group',
+                        'match' => 'id'
+                    ]
+                ],
+                'pre_return' => [ $this, 'get_graph' ]
+            ]
 		];
 	}
 
