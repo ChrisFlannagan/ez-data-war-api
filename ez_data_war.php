@@ -223,6 +223,12 @@ class ez_data_war {
             $request['results'] = $wpdb->get_results( "SELECT $y_axis as 'label', SUM($x_axis) as 'sum' FROM $table WHERE user = $user AND groups = $group GROUP BY $y_axis" );
         }
 
+        if( ! empty( $request['results'] ) ) {
+            foreach( $request['results'] as $result ) {
+                $result['sum'] = intval( $result['sum'] );
+            }
+        }
+
         if( $request['group'] ) {
             $table = $wpdb->prefix . 'ez_groups';
             $group_id = $request['group'];
