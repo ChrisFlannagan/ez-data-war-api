@@ -167,7 +167,7 @@ class ez_data_war {
                         'match' => 'id'
                     ]
                 ],
-                'pre_return' => [ $this, 'get_graph' ]
+                'pre_return' => [ $this, 'get_table' ]
             ]
 		];
 	}
@@ -203,6 +203,37 @@ class ez_data_war {
 
 		return $request;
 	}
+
+
+    public function get_table( $request ) {
+        global $wpdb;
+        $table = $wpdb->prefix . 'ez_items';
+        $group = $request['group'];
+        $user = $request['user'];
+        $x_axis = $request['x_axis'];
+        $y_axis = $request['y_axis'];
+
+        if( 'created_on_month' === $y_axis ) {
+            $y_axis = 'created_on';
+            $request['results'] = $wpdb->get_results( "SELECT MONTH( $y_axis ) as 'label', YEAR( $y_axis ) as 'year', SUM($x_axis) as 'sum' FROM $table WHERE user = $user AND groups = $group GROUP BY MONTH( $y_axis ), YEAR( $y_axis )" );
+        } elseif ( 'created_on_day' === $y_axis ) {
+            $y_axis = 'created_on';
+            $request['results'] = $wpdb->get_results( "SELECT DAY( $y_axis ) as 'label', SUM($x_axis) as 'sum' FROM $table WHERE user = $user AND groups = $group GROUP BY DAY( $y_axis )" );
+        } else {
+            $request['results'] = $wpdb->get_results( "SELECT $y_axis as 'label', SUM($x_axis) as 'sum' FROM $table WHERE user = $user AND groups = $group GROUP BY $y_axis" );
+        }
+
+        if( $request['group'] ) {
+            $table = $wpdb->prefix . 'ez_groups';
+            $group_id = $request['group'];
+            $request['group_data'] = $wpdb->get_results( "SELECT * FROM $table WHERE `id` = $group_id" );
+            if( ! empty( $request['group_data'] ) ) {
+                $request['group_data'] = $request['group_data'][0];
+            }
+        }
+
+        return $request;
+    }
 
 	public function group_delete_callback( $request ) {
 	    global $wpdb;
