@@ -225,7 +225,7 @@ class ez_data_war {
 
         if( ! empty( $request['results'] ) ) {
             foreach( $request['results'] as $result ) {
-                $result->sum = intval( $result->sum );
+                $result->sum = (float) $result->sum;
             }
         }
 
