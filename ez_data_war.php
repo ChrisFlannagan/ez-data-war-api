@@ -97,6 +97,11 @@ class ez_data_war {
 						'required' => false,
 						'default' => null
 					],
+                    'misc_five' => [
+                        'type' => 'array',
+                        'required' => false,
+                        'default' => null,
+                    ],
 
 				],
 				'assoc' => [
