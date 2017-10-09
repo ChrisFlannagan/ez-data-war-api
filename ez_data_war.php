@@ -125,6 +125,7 @@ class ez_data_war {
 					'misc_two_label' => 'string',
 					'misc_three_label' => 'string',
 					'misc_four_label' => 'string',
+                    'misc_five_label' => 'string',
 				],
 				'assoc' => [
 					'items' => [
