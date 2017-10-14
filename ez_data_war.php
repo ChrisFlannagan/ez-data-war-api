@@ -5,18 +5,44 @@ Description:  EZ Data Extension of WAR API
 Version: 1.0
 Author: ezdata
 License: GPL
+textdomain: ezdata_site
 */
 
+define( EZDATA_SITE_PLUGIN_DIR, plugin_dir_path( __FILE__ ) );
 
 
 add_filter( 'rest_pre_serve_request', function( $value ) {
-	header( 'Access-Control-Allow-Origin: *' );
-	header( 'Access-Control-Allow-Methods: POST, GET, OPTIONS, PUT, DELETE' );
-	header( 'Access-Control-Allow-Credentials: true' );
-	header( 'Access-Control-Allow-Headers: X-WP-Nonce, Content-Type, Authorization');
+    header( 'Access-Control-Allow-Origin: *' );
+    header( 'Access-Control-Allow-Methods: POST, GET, OPTIONS, PUT, DELETE' );
+    header( 'Access-Control-Allow-Credentials: true' );
+    header( 'Access-Control-Allow-Headers: X-WP-Nonce, Content-Type, Authorization');
 
-	return $value;
-}, 15);
+    return $value;
+}, 1, 1 );
+
+
+add_action( 'send_headers', function() {
+    if ( ! did_action('rest_api_init') && $_SERVER['REQUEST_METHOD'] == 'HEAD' ) {
+        header( 'Access-Control-Allow-Origin: *' );
+        header( 'Access-Control-Expose-Headers: Link' );
+        header( 'Access-Control-Allow-Methods: HEAD' );
+    }
+} );
+
+require_once( 'classes/autoloader.php' );
+
+// Register Questions
+use EZDataSite\Questions\QuestionAPI;
+QuestionAPI::init([
+    [
+        'id'        => 'MostSold',
+        'className' => 'EZDataSite\Questions\MostSold'
+    ],
+    [
+        'id'        => 'MostSoldProduct',
+        'className' => 'EZDataSite\Questions\MostSoldProduct',
+    ]
+]);
 
 class ez_data_war {
 
@@ -174,6 +200,17 @@ class ez_data_war {
                     ]
                 ],
                 'pre_return' => [ $this, 'get_table' ]
+            ],
+            'questions' => [
+                'name' => 'question',
+                'access' => true,
+                'params' => [
+                    'question_id'   => [ 'type' => 'string', 'required' => true ],
+                    'question_data' => [ 'type' => 'array', 'required' => true ],
+                    'group'         => [ 'type' => 'integer', 'required' => true ],
+                    'output'        => [ 'type' => 'string', 'required' => true ],
+                ],
+                'pre_return' => [ $this, 'get_question_config' ]
             ]
 		];
 	}
@@ -263,6 +300,16 @@ class ez_data_war {
         $deleted_group = $wpdb->delete( $table, [ 'id' => absint( trim( $request->params->id ) ) ], array( '%s') );
         $request->deleted_group = $deleted_group;
 
+        return $request;
+    }
+
+    public function get_question_config( $request ) {
+	    if( ! isset( $request['question_id'] ) ) {
+	        return $request;
+        }
+        $QuestionAPI = new QuestionAPI();
+        $request['question_config'] = $QuestionAPI->get_question_config( $request['question_id'] );
+        unset( $request['question_config']['data'] );
         return $request;
     }
 
