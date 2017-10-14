@@ -32,7 +32,8 @@ class MostSold extends Question {
                     'type'  => array(
                         'value',
                         'misc_one',
-                        'misc_two'
+                        'misc_two',
+                        'misc_five'
                     )
                 )
             ),
