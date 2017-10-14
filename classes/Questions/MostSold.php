@@ -27,13 +27,13 @@ class MostSold extends Question {
                     )
                 ),
                 array(
-                    'title' => 'Choose Field that Represents Products',
-                    'desc'  => 'Product(s) Sold - Should be a number',
+                    // Cannot Be array - this is single product
+                    'title' => 'Choose Field that Represents A Single Product Sold',
+                    'desc'  => 'Product Sold - Should be a number',
                     'type'  => array(
                         'value',
                         'misc_one',
                         'misc_two',
-                        'misc_five'
                     )
                 )
             ),
