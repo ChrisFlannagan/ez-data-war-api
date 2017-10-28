@@ -102,25 +102,23 @@ class MostSoldProduct extends Question {
             }
         }
 
-        $results = $wpdb->get_results( $query );
+	    $results = $wpdb->get_col( $query );
 
-        $tally = array();
-        foreach ( $results as $result ) {
-            $products = explode( ',', $result->products );
-            if ( ! empty( $products ) ) {
-                foreach ( $products as $product ) {
-                    if ( $tally[$product] ) {
-                        $tally[$product]->count++;
-                    } else {
-                        $tally[$product] = (object) array(
-                            'product' => $product,
-                            'count'   => 1
-                        );
-                    }
-                }
-            }
-        }
+	    $all_numbers = explode( ',', implode( ',', $results ) );
 
-        return $tally;
+	    $tally = [];
+
+	    foreach ( $all_numbers as $product_id ) {
+		    if ( isset( $tally[ $product_id ] ) ) {
+			    $tally[ $product_id ]->count++;
+		    } else {
+			    $tally[ $product_id ] = (object) [
+				    'product' => $product_id,
+				    'count'   => 1
+			    ];
+		    }
+	    }
+
+	    return $tally;
     }
 }
