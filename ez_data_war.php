@@ -205,10 +205,11 @@ class ez_data_war {
                 'name' => 'question',
                 'access' => true,
                 'params' => [
-                    'question_id'   => [ 'type' => 'string', 'required' => true ],
-                    'question_data' => [ 'type' => 'array', 'required' => true ],
-                    'group'         => [ 'type' => 'integer', 'required' => true ],
-                    'output'        => [ 'type' => 'string', 'required' => true ],
+                    'question_id'       => [ 'type' => 'string', 'required' => true ],
+                    'question_data'     => [ 'type' => 'array', 'required' => true ],
+                    'group'             => [ 'type' => 'integer', 'required' => true ],
+                    'output'            => [ 'type' => 'string', 'required' => true ],
+                    'output_options'    => [ 'type' => 'array', 'required' => false ],
                 ],
                 'pre_return' => [ $this, 'get_question_config' ]
             ]
@@ -304,12 +305,20 @@ class ez_data_war {
     }
 
     public function get_question_config( $request ) {
+	    global $wpdb;
 	    if( ! isset( $request['question_id'] ) ) {
 	        return $request;
         }
         $QuestionAPI = new QuestionAPI();
         $request['question_config'] = $QuestionAPI->get_question_config( $request['question_id'] );
         unset( $request['question_config']['data'] );
+        if ( isset( $request['group'] ) ) {
+            $table = $wpdb->prefix . 'ez_groups';
+            $group = $request['group'];
+            $user = $request['user'];
+            $query = $wpdb->get_results( "SELECT * from $table WHERE id = $group AND user = $user" );
+            $request['group_data'] = $query[0];
+        }
         return $request;
     }
 
